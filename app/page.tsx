@@ -3,61 +3,43 @@
 import type React from "react"
 
 import { useState } from "react"
-import {
-  ChevronRight,
-  Home,
-  Download,
-  Monitor,
-  FileText,
-  Layers,
-  Zap,
-  Settings,
-  Shield,
-  AlertTriangle,
-  Gauge,
-} from "lucide-react"
+import { ChevronRight, Home, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react"
 
 type ContentType =
+  | "overview"
   | "download-install"
   | "basic-interface"
   | "circuit-drawing"
-  | "pcb-layout"
   | "high-speed-design"
-  | "differential-pairs"
   | "power-planes"
-  | "install-issues"
-  | "license-management"
-  | "performance-optimization"
+  | "odbc-setup"
+  | "orcad-config"
 
 export default function AllegroTutorial() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
-  const [activeContent, setActiveContent] = useState<ContentType>("download-install")
+  const [activeContent, setActiveContent] = useState<ContentType>("overview")
 
   const menuItems = [
     {
+      category: "概覽",
+      items: [{ id: "overview" as ContentType, title: "安裝指南概覽", number: 0 }],
+    },
+    {
       category: "License 申請",
       items: [
-        { id: "download-install" as ContentType, title: "至EIP申請權限開通", icon: Download },
-        { id: "basic-interface" as ContentType, title: "基本介面操作指南", icon: Monitor },
-        { id: "circuit-drawing" as ContentType, title: "電路圖繪製基礎", icon: FileText },
-        { id: "pcb-layout" as ContentType, title: "PCB 佈局設計流程", icon: Layers },
+        { id: "download-install" as ContentType, title: "至EIP申請權限開通", number: 1 },
+        { id: "basic-interface" as ContentType, title: "至FIP系統申請WebDB system使用權限", number: 2 },
+        { id: "circuit-drawing" as ContentType, title: "至RM系統申請Allegro/OrCAD license", number: 3 },
       ],
     },
     {
-      category: "進階功能",
+      category: "安裝步驟",
       items: [
-        { id: "high-speed-design" as ContentType, title: "高速信號設計", icon: Zap },
-        { id: "differential-pairs" as ContentType, title: "差分對設計技巧", icon: Settings },
-        { id: "power-planes" as ContentType, title: "電源平面設計", icon: Shield },
-      ],
-    },
-    {
-      category: "疑難排解",
-      items: [
-        { id: "install-issues" as ContentType, title: "常見安裝問題解決", icon: AlertTriangle },
-        { id: "license-management" as ContentType, title: "授權管理問題", icon: FileText },
-        { id: "performance-optimization" as ContentType, title: "效能優化設定", icon: Gauge },
+        { id: "high-speed-design" as ContentType, title: "Allegro/OrCAD 17.4 安裝", number: 4 },
+        { id: "power-planes" as ContentType, title: "ISR 安裝", number: 5 },
+        { id: "odbc-setup" as ContentType, title: "ODBC 設定", number: 6 },
+        { id: "orcad-config" as ContentType, title: "OrCAD 17.4 相關設定", number: 7 },
       ],
     },
   ]
@@ -82,28 +64,24 @@ export default function AllegroTutorial() {
 
   const renderContent = () => {
     switch (activeContent) {
+      case "overview":
+        return <OverviewContent onNavigate={setActiveContent} />
       case "download-install":
         return <DownloadInstallContent />
       case "basic-interface":
         return <BasicInterfaceContent />
       case "circuit-drawing":
         return <CircuitDrawingContent />
-      case "pcb-layout":
-        return <PCBLayoutContent />
       case "high-speed-design":
         return <HighSpeedDesignContent />
-      case "differential-pairs":
-        return <DifferentialPairsContent />
       case "power-planes":
         return <PowerPlanesContent />
-      case "install-issues":
-        return <InstallIssuesContent />
-      case "license-management":
-        return <LicenseManagementContent />
-      case "performance-optimization":
-        return <PerformanceOptimizationContent />
+      case "odbc-setup":
+        return <OdbcSetupContent />
+      case "orcad-config":
+        return <OrcadConfigContent />
       default:
-        return <DownloadInstallContent />
+        return <OverviewContent onNavigate={setActiveContent} />
     }
   }
 
@@ -172,7 +150,7 @@ export default function AllegroTutorial() {
               />
             </div>
 
-            <h2 className="text-lg font-semibold text-gray-800 mb-6">Allegro/OrCAD 17.4安裝指南</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-6">Allegro/OrCAD 17.4 安裝指南</h2>
 
             <nav className="space-y-1">
               {menuItems.map((category, categoryIndex) => (
@@ -180,7 +158,6 @@ export default function AllegroTutorial() {
                   <h3 className="text-sm font-medium text-gray-600 mb-2">{category.category}</h3>
                   <ul className="space-y-1 ml-4">
                     {category.items.map((item) => {
-                      const Icon = item.icon
                       const isActive = activeContent === item.id
                       return (
                         <li key={item.id}>
@@ -194,8 +171,12 @@ export default function AllegroTutorial() {
                           >
                             {isActive ? (
                               <span className="w-2 h-2 rounded-full mr-3 bg-lime-600"></span>
+                            ) : item.number === 0 ? (
+                              <Home className="w-4 h-4 mr-3" />
                             ) : (
-                              <Icon className="w-4 h-4 mr-3" />
+                              <span className="w-6 h-6 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-medium mr-3">
+                                {item.number}
+                              </span>
                             )}
                             {item.title}
                           </button>
@@ -228,6 +209,155 @@ export default function AllegroTutorial() {
   )
 }
 
+// Overview Content Component
+function OverviewContent({ onNavigate }: { onNavigate: (content: ContentType) => void }) {
+  const handleNavigation = (contentId: ContentType) => {
+    onNavigate(contentId)
+    // 滾動到頂部
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const installationSteps = [
+    {
+      id: "download-install" as ContentType,
+      number: 1,
+      title: "至EIP申請權限開通",
+      description: "申請系統權限，建立必要的資料夾存取權限",
+      category: "License 申請",
+    },
+    {
+      id: "basic-interface" as ContentType,
+      number: 2,
+      title: "至FIP系統申請WebDB system使用權限",
+      description: "申請WebDB系統使用權限，用於OrCAD認證",
+      category: "License 申請",
+    },
+    {
+      id: "circuit-drawing" as ContentType,
+      number: 3,
+      title: "至RM系統申請Allegro/OrCAD license",
+      description: "申請軟體授權，分別申請OrCAD和Allegro兩個授權",
+      category: "License 申請",
+    },
+    {
+      id: "high-speed-design" as ContentType,
+      number: 4,
+      title: "Allegro/OrCAD 17.4 安裝",
+      description: "執行主要軟體安裝程序，包含完整的安裝步驟",
+      category: "安裝步驟",
+    },
+    {
+      id: "power-planes" as ContentType,
+      number: 5,
+      title: "ISR 安裝",
+      description: "安裝軟體更新補丁，確保軟體穩定性",
+      category: "安裝步驟",
+    },
+    {
+      id: "odbc-setup" as ContentType,
+      number: 6,
+      title: "ODBC 設定",
+      description: "設定資料庫連接和環境變數",
+      category: "安裝步驟",
+    },
+    {
+      id: "orcad-config" as ContentType,
+      number: 7,
+      title: "OrCAD 17.4 相關設定",
+      description: "完成OrCAD的初始設定和零件庫配置",
+      category: "安裝步驟",
+    },
+  ]
+
+  return (
+    <div className="animate-fadeIn">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Allegro/OrCAD 17.4 安裝指南</h1>
+        <p className="text-xl text-gray-600">完整的軟體安裝與設定流程</p>
+      </div>
+
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-semibold text-blue-900 mb-4">歡迎使用安裝指南</h2>
+          <p className="text-blue-800 mb-4">
+            本指南將引導您完成 Allegro/OrCAD 17.4
+            的完整安裝流程。請按照以下順序進行操作，確保每個步驟都正確完成後再進行下一步。
+          </p>
+          <p className="text-blue-700">整個安裝過程包含授權申請和軟體安裝兩個主要階段，預計需要 2-3 個工作天完成。</p>
+        </div>
+
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">安裝順序</h2>
+
+        <div className="space-y-4 mb-8">
+          {installationSteps.map((step, index) => (
+            <div
+              key={step.id}
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <span className="w-10 h-10 bg-lime-100 text-lime-600 rounded-full flex items-center justify-center text-lg font-semibold">
+                    {step.number}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium text-gray-900">{step.title}</h3>
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{step.category}</span>
+                  </div>
+                  <p className="text-gray-600 mb-3">{step.description}</p>
+                  <button
+                    onClick={() => handleNavigation(step.id)}
+                    className="inline-flex items-center text-lime-600 hover:text-lime-700 font-medium text-sm"
+                  >
+                    查看詳細步驟
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </button>
+                </div>
+              </div>
+              {index < installationSteps.length - 1 && <div className="mt-4 ml-5 border-l-2 border-gray-200 h-4"></div>}
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-8 rounded-r-lg">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-red-400 mt-0.5" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-lg font-medium text-red-800 mb-3">重要注意事項</h3>
+              <div className="text-red-700 space-y-2">
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p>請License 申請並簽核通過後，再進行軟體安裝，否則將視為違法安裝。</p>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p>License 是和您的賬號以及電腦名稱綁定的，更換OA 請重新申請。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+          <h3 className="text-lg font-medium text-green-900 mb-3">開始安裝</h3>
+          <p className="text-green-800 mb-4">
+            準備好開始安裝了嗎？點擊左側選單中的第一個步驟「至EIP申請權限開通」開始您的安裝之旅。
+          </p>
+          <button
+            onClick={() => handleNavigation("download-install")}
+            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors font-medium"
+          >
+            開始第一步
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Content Components
 function DownloadInstallContent() {
   return (
@@ -237,7 +367,7 @@ function DownloadInstallContent() {
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
+      <div className="prose prose-lg max-w-none leading-relaxed">
         <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-8 rounded-r-lg">
           <div className="flex items-start">
             <div className="flex-shrink-0">
@@ -307,7 +437,7 @@ function DownloadInstallContent() {
                         \\ar-erd-01 ，另外需要建立<span className="text-red-600 font-medium">Tim</span>的資料夾
                       </p>
                       <p className="">
-                        https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &Allegro License
+                        https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &amp;Allegro License
                       </p>
                     </div>
                   </div>
@@ -326,7 +456,7 @@ function DownloadInstallContent() {
 
 讀寫：
 \\\\ar-erd-01 ，另外需要建立Tim的資料夾
-https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &Allegro License`
+https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &amp;Allegro License`
                 navigator.clipboard.writeText(textToCopy)
                 alert("已複製到剪貼簿！")
               }}
@@ -351,83 +481,45 @@ function BasicInterfaceContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">基本介面操作指南</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">至FIP系統申請WebDB system使用權限</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          熟悉 Allegro/OrCad 的使用者介面是成功進行 PCB 設計的第一步。
-          本指南將帶您了解軟體的主要介面元素、工具列、選單系統以及基本操作方式。
-        </p>
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <p className="text-gray-700 leading-relaxed mb-6">等人資建立完資料即可上去申請</p>
 
-        <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-8 rounded-r-lg">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <Monitor className="w-5 h-5 text-green-400 mt-0.5" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">學習目標</h3>
-              <p className="mt-1 text-sm text-green-700">
-                完成本章節後，您將能夠熟練操作 Allegro/OrCad 的基本介面功能。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">主要介面區域</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
-              <Monitor className="w-5 h-5 mr-2 text-blue-500" />
-              設計視窗
-            </h3>
-            <p className="text-gray-600 text-sm">
-              主要的設計工作區域，顯示電路圖或 PCB 佈局。支援縮放、平移和多視窗顯示。
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-blue-900 mb-4">申請步驟</h3>
+          <div className="space-y-3">
+            <p className="text-blue-800">
+              <a href="https://fip.pegatroncorp.com/FIP2/Apply" className="text-blue-600 hover:underline font-medium">
+                https://fip.pegatroncorp.com/FIP2/Apply
+              </a>
             </p>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
-              <Settings className="w-5 h-5 mr-2 text-green-500" />
-              工具面板
-            </h3>
-            <p className="text-gray-600 text-sm">包含各種繪圖工具、選取工具和編輯功能，可自訂工具列配置。</p>
+            <p className="text-blue-700">搜尋 RRF → RRF - WebDB system權限申請單</p>
           </div>
         </div>
 
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">基本操作技巧</h2>
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p1-6fhUbmjSLHnyAGK1GHglLP9LtB72bm.png"
+          alt="FIP系統搜尋RRF介面"
+          className="max-w-4xl mx-auto mt-4 mb-6 rounded-lg border border-gray-200 w-full"
+        />
 
-        <div className="space-y-4 mb-6">
-          {[
-            {
-              title: "視窗導航",
-              description: "使用滑鼠滾輪縮放，按住中鍵拖曳平移視窗，雙擊可自動縮放至適合大小。",
-            },
-            {
-              title: "物件選取",
-              description: "單擊選取單一物件，拖曳框選多個物件，按住 Ctrl 鍵可多重選取。",
-            },
-            {
-              title: "快速鍵使用",
-              description: "熟記常用快速鍵可大幅提升工作效率，如 Ctrl+Z 復原、Ctrl+S 儲存等。",
-            },
-          ].map((item, index) => (
-            <div
-              key={index}
-              className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                {index + 1}
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900">{item.title}</h4>
-                <p className="text-gray-600 mt-1">{item.description}</p>
-              </div>
-            </div>
-          ))}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-green-900 mb-3">提交申請</h3>
+          <div className="text-green-800">
+            <p>申請項目:WebDB system使用權限申請</p>
+            <p>申請原因:需要使用OrCAD並進行認證</p>
+            <p className="mt-2">填完單後確定送出</p>
+          </div>
         </div>
+
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p2-B50KCESa0k21FA7WH6svLQQzaJeGe0.png"
+          alt="申請表單詳細資訊"
+          className="max-w-4xl mx-auto mt-4 rounded-lg border border-gray-200 w-full"
+        />
       </div>
     </div>
   )
@@ -437,103 +529,63 @@ function CircuitDrawingContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">電路圖繪製基礎</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">至RM系統申請Allegro/OrCAD license</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          電路圖是 PCB 設計的基礎，正確的電路圖繪製是確保最終產品功能正常的關鍵。 本章節將介紹如何在 OrCad Capture
-          中建立和編輯電路圖。
-        </p>
-
-        <div className="bg-purple-50 border-l-4 border-purple-400 p-6 mb-8 rounded-r-lg">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <FileText className="w-5 h-5 text-purple-400 mt-0.5" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-purple-800">開始之前</h3>
-              <p className="mt-1 text-sm text-purple-700">確保您已經熟悉基本介面操作，並準備好元件庫檔案。</p>
-            </div>
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-blue-900 mb-4">申請步驟</h3>
+          <div className="space-y-3">
+            <p className="text-blue-800">
+              <a href="https://rm.pegatroncorp.com/" className="text-blue-600 hover:underline font-medium">
+                https://rm.pegatroncorp.com/
+              </a>
+            </p>
+            <p className="text-blue-700">點選 新增</p>
           </div>
         </div>
 
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">建立新專案</h2>
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p3-gGbWjVRewzS2QusxwrSUrYuaM7w8gt.png"
+          alt="RM系統新增按鈕"
+          className="max-w-4xl mx-auto mt-4 mb-6 rounded-lg border border-gray-200 w-full"
+        />
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">專案設定步驟</h3>
-          <ol className="space-y-3 text-gray-700">
-            <li className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
-                1
-              </span>
-              開啟 OrCad Capture CIS
-            </li>
-            <li className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
-                2
-              </span>
-              選擇 File → New → Project
-            </li>
-            <li className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
-                3
-              </span>
-              選擇專案類型（建議選擇 Analog or Mixed A/D）
-            </li>
-            <li className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
-                4
-              </span>
-              設定專案名稱和儲存位置
-            </li>
-            <li className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
-                5
-              </span>
-              建立第一個電路圖頁面
-            </li>
-          </ol>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-yellow-900 mb-3">請注意以下3點:</h3>
+          <div className="text-yellow-800">
+            <p>1. Allegro和OrCAD 分開申請，所以共申請2單。</p>
+            <p>2. 電腦名稱為自己裝置名稱</p>
+            <p>3. 希望完成日請延後1~2天，防止過期無法簽核。</p>
+          </div>
         </div>
-      </div>
-    </div>
-  )
-}
 
-function PCBLayoutContent() {
-  return (
-    <div className="animate-fadeIn">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">PCB 佈局設計流程</h1>
-        <p className="text-gray-600">2025年6月25日</p>
-      </div>
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p4-TWWY7t3NtqyPgHWhbeCamSgxOKj0GQ.png"
+          alt="電腦名稱設定"
+          className="max-w-2xl mx-auto mt-4 mb-6 rounded-lg border border-gray-200"
+        />
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          PCB 佈局設計是將電路圖轉換為實際電路板的關鍵步驟。 良好的佈局設計不僅影響電路性能，也關係到製造成本和可靠性。
-        </p>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">OrCAD申請單:</h2>
 
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">佈局設計原則</h2>
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p5-BPaJYgenw7ulV7ddaLK6nkGSpXnqIf.png"
+          alt="OrCAD申請單"
+          className="max-w-3xl mx-auto mt-4 mb-6 rounded-lg border border-gray-200"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {[
-            { icon: Layers, title: "層次規劃", description: "合理規劃信號層、電源層和地層的配置", color: "indigo" },
-            { icon: Zap, title: "信號完整性", description: "考慮高速信號的傳輸特性和干擾問題", color: "yellow" },
-            { icon: Shield, title: "EMC 設計", description: "電磁相容性考量和屏蔽設計", color: "green" },
-          ].map((item, index) => {
-            const Icon = item.icon
-            return (
-              <div
-                key={index}
-                className="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow"
-              >
-                <Icon className={`w-8 h-8 text-${item.color}-500 mx-auto mb-3`} />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
-              </div>
-            )
-          })}
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Allegro申請單:</h2>
+
+        <img
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p6-P7xr13hHK207oJWYPKe2xcX3TizYq2.png"
+          alt="Allegro申請單"
+          className="max-w-3xl mx-auto mt-4 mb-6 rounded-lg border border-gray-200"
+        />
+
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-green-900 mb-3">重要提醒</h3>
+          <p className="text-green-800">申請需要時間，建議可以先做安裝的第1步和第2步，轉移檔案而已不用license。</p>
         </div>
       </div>
     </div>
@@ -544,45 +596,159 @@ function HighSpeedDesignContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">高速信號設計</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Allegro/OrCAD 17.4 安裝</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          隨著電子產品工作頻率不斷提高，高速信號設計變得越來越重要。 本章節將介紹高速 PCB 設計的基本原理和實作技巧。
-        </p>
-
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg">
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-8 rounded-r-lg">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <Zap className="w-5 h-5 text-yellow-400 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">高速信號定義</h3>
-              <p className="mt-1 text-sm text-yellow-700">
-                當信號的上升時間小於傳輸延遲時間的 6 倍時，就需要考慮高速設計問題。
+              <h3 className="text-base font-medium text-red-800">重要提醒</h3>
+              <p className="mt-1 text-base text-red-700">
+                請License 申請並簽核通過後，再進行軟體安裝，否則將視為違法安裝!
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
 
-function DifferentialPairsContent() {
-  return (
-    <div className="animate-fadeIn">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">差分對設計技巧</h1>
-        <p className="text-gray-600">2025年6月25日</p>
-      </div>
+        <div className="space-y-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">1. 建立T槽</h3>
+            <p className="text-blue-800 mb-4">將\\asr-cis-01\PEGATRON_PART 建立T槽</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p1-CUbevrVZFtVVk7eviQb9NNOiZ287nh.png"
+              alt="建立T槽"
+              className="max-w-2xl mx-auto rounded-lg border border-blue-200"
+            />
+          </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          差分信號傳輸在高速數位設計中扮演重要角色，能有效降低電磁干擾並提高信號品質。
-        </p>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-3">2. 複製檔案</h3>
+            <p className="text-gray-700 mb-2">將以下兩個資料夾複製到C槽 (需要一天時間):</p>
+            <div className="bg-white p-4 rounded border border-gray-300 font-mono text-sm space-y-1">
+              <p>T:\Tools\SPB17.4</p>
+              <p>T:\Tools\SPB17.4_ISR\Hotfix_SPB17.40.040_wint</p>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-yellow-900 mb-3">
+              3. 執行安裝程式 <span className="text-red-600 font-bold">(要有license才可以執行第三步!)</span>
+            </h3>
+            <p className="text-yellow-800 mb-4">
+              {"複製到C槽後，點開SPB17.4，右鍵->以系統管理員身份執行setup.exe，檔案比較大，需要等待5-10"}
+              分鐘
+            </p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p2-9i1gUBSCAn9QPCiE9uXuxsuECWh2bK.png"
+              alt="以系統管理員身份執行"
+              className="max-w-xl mx-auto rounded-lg border border-yellow-200"
+            />
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-green-900 mb-3">4. 選擇安裝選項</h3>
+            <p className="text-green-800 mb-2">點擊OrCAD and Allegro Products Installation，執行安裝檔案</p>
+            <p className="text-red-600 font-medium mb-4">
+              PS:不要點License Manager，如果點錯，取消終止無用，需請MIS
+              卸掉，不然會被稽核。需要等待一段時間以搜集電腦信息
+            </p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p3-KyUN4Y3VJvgIEKT9Coazm19FzSGO3p.png"
+              alt="選擇安裝選項"
+              className="max-w-3xl mx-auto rounded-lg border border-green-200"
+            />
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">5. 接受授權協議</h3>
+            <p className="text-blue-800 mb-4">選擇I Accept，再按Next</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p4-1fzdKRw4kC3y4qtN1W6JbomegnwwX1.png"
+              alt="接受授權協議"
+              className="max-w-3xl mx-auto rounded-lg border border-blue-200"
+            />
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-purple-900 mb-3">6. 安裝設定</h3>
+            <div className="text-purple-800 space-y-2 mb-4">
+              <p>選擇：Only for me；設定安裝路徑C:\Cadence\SPB_17.4</p>
+              <p>Working Directrory 設定Home 路徑，請改為D:\pro.174 (此為預設值，可變更為實際安裝的Utility 路徑)。</p>
+              <p>按Custom Installation 繼續下一步</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p5-fshQys1nn00Xrniof3zLplMp4KG2eV.png"
+              alt="安裝設定"
+              className="max-w-3xl mx-auto rounded-lg border border-purple-200"
+            />
+          </div>
+
+          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-indigo-900 mb-3">7. 選擇安裝項目</h3>
+            <p className="text-indigo-800 mb-4">{"請依所申請License 選擇安裝項目->按Next 鈕"}</p>
+            <p className="text-indigo-700 mb-4">
+              （1）若申請OrCAD License 及Allegro License並都已簽核通過，請選擇OrCAD Capture CIS &amp; Allegro PCB Editor
+              Router and SI 進行安裝
+            </p>
+
+            <div className="space-y-4">
+              <img
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p6-cSe3xB5FgClhptYa1aUQlXqv1lkBVO.png"
+                alt="OrCAD選項"
+                className="max-w-3xl mx-auto rounded-lg border border-indigo-200"
+              />
+              <img
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p8-XCv3ZlkCb46OF3iUh73ggMNoWbJnmp.png"
+                alt="Allegro選項"
+                className="max-w-3xl mx-auto rounded-lg border border-indigo-200"
+              />
+            </div>
+
+            <p className="text-indigo-700 mt-4">
+              （2）Allow programs to connect through Windows firewall勾選或不勾選都可
+            </p>
+          </div>
+
+          <div className="bg-teal-50 border border-teal-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-teal-900 mb-3">8. 繼續安裝</h3>
+            <p className="text-teal-800 mb-4">按Next 繼續</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p9-y4L801E9AqQifEK3biPpHVVFlE4Lxy.png"
+              alt="繼續安裝"
+              className="max-w-3xl mx-auto rounded-lg border border-teal-200"
+            />
+          </div>
+
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-orange-900 mb-3">9. License Server 設定</h3>
+            <div className="text-orange-800 space-y-2 mb-4">
+              <p>Port Number 填入5280</p>
+              <p>Host name 填入cadcam (for 台北同仁) psz-cadcam-01v (for 大陸同仁)</p>
+              <p>按Install 確定執行安裝</p>
+              <p className="font-medium">安裝過程中不能關閉安裝程序，必須等安裝完成以後自動退出</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p10-nQb4wAPqOJeMiMB7wHQl3yQ8jFYsqV.png"
+              alt="License Server設定"
+              className="max-w-3xl mx-auto rounded-lg border border-orange-200"
+            />
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-green-900 mb-3">10. 完成安裝</h3>
+            <p className="text-green-800 mb-4">出現此畫面代表，已完成安裝主體程序，下圖無需勾選，點擊Finish</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p11-I8Grl3VW5wDdjVb5K6kYkpJgDtdDOq.png"
+              alt="完成安裝"
+              className="max-w-3xl mx-auto rounded-lg border border-green-200"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -592,65 +758,255 @@ function PowerPlanesContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">電源平面設計</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">ISR 安裝</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          良好的電源平面設計是確保電路穩定工作的基礎，影響整體系統的性能和可靠性。
-        </p>
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="space-y-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">1. 執行ISR安裝程式</h3>
+            <p className="text-blue-800 mb-4">
+              {"點開C槽的Hotfix_SPB17.40.040_wint，右鍵->以系統管理員身份執行setup.exe"}
+            </p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p1-ELM1j7GN8ybzGzHGZnnbO8w5jFLcuZ.png"
+              alt="執行ISR安裝程式"
+              className="max-w-2xl mx-auto rounded-lg border border-blue-200"
+            />
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-green-900 mb-3">2. 接受授權協議</h3>
+            <p className="text-green-800 mb-4">選擇接受項目，再按Next</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p2-C3kTh2dhDanHFPhCRzXKWyGbuJ1YE1.png"
+              alt="接受授權協議"
+              className="max-w-3xl mx-auto rounded-lg border border-green-200"
+            />
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-yellow-900 mb-3">3. 確認安裝項目</h3>
+            <p className="text-yellow-800 mb-4">顯示所更新的產品，按Install 確定執行安裝</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p3-2fxmB8zoasKGn4DIwPHI4UOmU0UXrn.png"
+              alt="確認安裝項目"
+              className="max-w-3xl mx-auto rounded-lg border border-yellow-200"
+            />
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-purple-900 mb-3">4. 完成安裝</h3>
+            <p className="text-purple-800 mb-4">點擊Finish 完成安裝</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p4-8SwpVBXKKTrVKauEahs9InEC8WW3JK.png"
+              alt="完成安裝"
+              className="max-w-3xl mx-auto rounded-lg border border-purple-200"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-function InstallIssuesContent() {
+function OdbcSetupContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">常見安裝問題解決</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">ODBC 設定</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          在安裝 Allegro/OrCad 過程中可能遇到各種問題，本章節整理了常見問題及解決方案。
-        </p>
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="space-y-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">1. 下載ODBC設定檔案</h3>
+            <p className="text-blue-800 mb-4">
+              去C:\SPB17.4\Allegro OrCAD 17.4 Q&A\ODBC設定 下載 win10 64位元 並照著Word 檔案ODBC_sop上的步驟操作即可
+            </p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p1-YfHzdHAsLWiTFXCt0HhAGbGv9zmRZO.png"
+              alt="ODBC設定檔案位置"
+              className="max-w-3xl mx-auto rounded-lg border border-blue-200"
+            />
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-green-900 mb-3">2. 環境變數設定</h3>
+            <div className="text-green-800 space-y-3 mb-4">
+              <p>ODBC_sop操作完後進入環境變數設定(控制台&gt; 使用者賬戶&gt; 使用者賬戶&gt; 變更我的環境變數)</p>
+              <p>請確認系統變數或使用者變數是否有CDS_LIC_FILE 的參數</p>
+              <p className="font-medium">若無請新增，其值須設定為5280@asr-cae-01;5280@cadcam</p>
+              <p className="font-medium">另外並新增參數IGNORE_PROP，其值設定為DEVICE</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p2-5YQlQukar5RkJOAaL33ETS8tsNVMfR.png"
+              alt="環境變數設定"
+              className="max-w-3xl mx-auto rounded-lg border border-green-200"
+            />
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-yellow-900 mb-3">3. 安裝Utility</h3>
+            <p className="text-yellow-800 mb-4">到 T:\Allegro_patch\UTILITY\17.4 點擊安裝</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p3-BCmH06L79nMO1fv8fT8MxG6oVyU7li.png"
+              alt="Utility安裝檔案"
+              className="max-w-2xl mx-auto rounded-lg border border-yellow-200 mb-4"
+            />
+            <p className="text-yellow-800 mb-4">Utility 的安裝路徑默認D:\</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p4-2mdjrBtc0eBR7d9GyqAHXfADDK6H4a.png"
+              alt="Utility安裝路徑"
+              className="max-w-3xl mx-auto rounded-lg border border-yellow-200"
+            />
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-purple-900 mb-3">4. HOME環境變數設定</h3>
+            <div className="text-purple-800 space-y-2 mb-4">
+              <p>環境變數中的HOME 的值需要改為D:\pro.174</p>
+              <p className="text-sm text-purple-600">此外，如果您不使用公司的Utility 菜單功能，那麼請忽略這一步</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p5-bieScC8Mg18sWJVgz8FBe6Zr1injqb.png"
+              alt="HOME環境變數設定"
+              className="max-w-3xl mx-auto rounded-lg border border-purple-200"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-function LicenseManagementContent() {
+function OrcadConfigContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">授權管理問題</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">OrCAD 17.4 相關設定</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          Cadence 軟體需要有效的授權才能正常運作，本章節說明授權管理的相關問題和解決方法。
-        </p>
-      </div>
-    </div>
-  )
-}
+      <div className="prose prose-lg max-w-none leading-relaxed">
+        <div className="space-y-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">1. 啟動OrCAD 17.4</h3>
+            <p className="text-blue-800 mb-4">啟動OrCAD 17.4，選擇前兩項中任1項</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p1-50glaOFw7mVMLQyU0KNDLuocRhUEhS.png"
+              alt="OrCAD產品選擇"
+              className="max-w-2xl mx-auto rounded-lg border border-blue-200 mb-4"
+            />
+            <p className="text-blue-800 mb-4">改善計劃選擇：否</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p2-74kLRghAdO8b8o4MEDSUDpaQ3Ef1yf.png"
+              alt="客戶體驗改善計劃"
+              className="max-w-3xl mx-auto rounded-lg border border-blue-200 mb-4"
+            />
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mt-4">
+              <p className="text-yellow-800 text-sm">
+                如果開啟時Start Page 出現錯誤提示，請點擊"否"忽略它。這個是OrCAD
+                要連接官網，但是公司網路把它擋住了。你可以勾選Start Page 左下角的選項，來禁用Start Page 功能
+              </p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p3-E6FJHEFtM5aSYP0HALLkvBdVnwEUp8.png"
+              alt="禁用Start Page選項"
+              className="max-w-xs mx-auto rounded-lg border border-blue-200 mt-4"
+            />
+          </div>
 
-function PerformanceOptimizationContent() {
-  return (
-    <div className="animate-fadeIn">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">效能優化設定</h1>
-        <p className="text-gray-600">2025年6月25日</p>
-      </div>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-green-900 mb-3">2. CIS Configuration設定</h3>
+            <p className="text-green-800 mb-4">
+              執行File &gt; New &gt; Design 後，再選擇Options &gt; CIS Configuration
+            </p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p4-gjJFl3YeLKwo8NsKxyEi0TIlMuUJvH.png"
+              alt="CIS Configuration選單"
+              className="max-w-4xl mx-auto rounded-lg border border-green-200"
+            />
+          </div>
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          透過適當的設定調整，可以顯著提升 Allegro/OrCad 的執行效能和使用體驗。
-        </p>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-purple-900 mb-3">3. 選擇資料庫檔案</h3>
+            <div className="text-purple-800 space-y-2 mb-4">
+              <p>進入設定畫面中請點擊Browse 鍵，默認選擇T:\ASROCK_CIS98_ORCAD163.DBC</p>
+              <p className="text-sm">有部分部門有自己的零件庫，請根據實際情況選擇，位於T:\ODBC 目錄下</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p5-w5U6qWuIM5y4RWkychyURtUJ5WDFa8.png"
+              alt="CIS Configuration檔案選擇"
+              className="max-w-2xl mx-auto rounded-lg border border-purple-200"
+            />
+          </div>
+
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-orange-900 mb-3">4. 輸入登入資訊</h3>
+            <p className="text-orange-800 mb-4">請輸入識別碼orcad_guest ，密碼為guest</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p6-IGPrEnGoc3mEsgJ07B6rdzib4UzoXn.png"
+              alt="SQL Server登入"
+              className="max-w-xl mx-auto rounded-lg border border-orange-200"
+            />
+          </div>
+
+          <div className="bg-teal-50 border border-teal-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-teal-900 mb-3">5. 放置零件</h3>
+            <p className="text-teal-800 mb-4">回到剛剛新開啟一張設計圖，點選Place &gt; Part</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p7-sb3dxCYi4uIG50vkvmjMzu2UCeXYsF.png"
+              alt="Place Part選單"
+              className="max-w-2xl mx-auto rounded-lg border border-teal-200"
+            />
+          </div>
+
+          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-indigo-900 mb-3">6. 移除現有Libraries</h3>
+            <p className="text-indigo-800 mb-4">移除Design Cache 以外的所有Libraries</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p8-dqDvFFauc4QqzDOxC9633kZYQ24By5.png"
+              alt="移除Libraries"
+              className="max-w-xs mx-auto rounded-lg border border-indigo-200"
+            />
+          </div>
+
+          <div className="bg-pink-50 border border-pink-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-pink-900 mb-3">7. 新增Library檔案</h3>
+            <div className="text-pink-800 space-y-2 mb-4">
+              <p>點選Add Library，選取T:\parts 目錄內的所有檔案</p>
+              <p className="text-sm text-pink-600">因為網絡問題，需要花費1-2 分鐘(建議使用有線網絡)</p>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p9-JtLO36zNoIt4nAq5lopGCEjhezv2kP.png"
+              alt="新增Library檔案"
+              className="max-w-4xl mx-auto rounded-lg border border-pink-200"
+            />
+          </div>
+
+          <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-cyan-900 mb-3">8. 測試零件放置</h3>
+            <p className="text-cyan-800 mb-4">請於Part List 任意選擇一零件擺至圖面上，最後不存檔關閉OrCAD</p>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/p10-ZGzjqIsvlBQHZakulvovedQNyECeyK.png"
+              alt="零件放置測試"
+              className="max-w-4xl mx-auto rounded-lg border border-cyan-200"
+            />
+          </div>
+
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-3">9. 關閉設定</h3>
+            <div className="text-gray-800 space-y-2">
+              <p>關閉OrCAD 時會顯示對話視窗,請勾選"Do not show this box again"項目後點選No All 鈕</p>
+              <p className="mt-4 font-medium">
+                重新開啟OrCAD。此時需要把剛剛設定的零件庫重新載入，因此需要花費1-2 分鐘
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
