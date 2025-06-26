@@ -325,7 +325,8 @@ function DownloadInstallContent() {
 \\\\asrr-qt-01\\BIOS_Verify\\ASRock
 
 讀寫：
-\\\\ar-erd-01 ，另外需要建立Tim的資料夾`
+\\\\ar-erd-01 ，另外需要建立Tim的資料夾
+https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &Allegro License`
                 navigator.clipboard.writeText(textToCopy)
                 alert("已複製到剪貼簿！")
               }}
