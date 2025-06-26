@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { ChevronRight, Home, AlertTriangle, CheckCircle, ArrowRight, Menu, X } from "lucide-react"
+import { ChevronRight, Home, AlertTriangle, CheckCircle, ArrowRight, Menu } from "lucide-react"
 
 type ContentType =
   | "overview"
@@ -157,7 +157,6 @@ export default function AllegroTutorial() {
                     alt="ASRock Logo"
                     className="h-8 w-auto mb-2"
                   />
-                  <X className="w-5 h-5 text-gray-400" />
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
@@ -241,7 +240,16 @@ export default function AllegroTutorial() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 relative">
+          {/* Company Logo - Top Right */}
+          <div className="absolute top-4 right-4 z-10">
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ASROCK-V4Wi9xhIVrHRLhYuVcQgOSYI4EBtlu.png"
+              alt="ASRock Logo"
+              className="h-8 w-auto opacity-80 hover:opacity-100 transition-opacity"
+            />
+          </div>
+
           {/* Breadcrumb */}
           <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
             <Home className="w-4 h-4" />
