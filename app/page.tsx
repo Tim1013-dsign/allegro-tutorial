@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import {
   ChevronRight,
@@ -28,13 +30,15 @@ type ContentType =
   | "performance-optimization"
 
 export default function AllegroTutorial() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [password, setPassword] = useState("")
   const [activeContent, setActiveContent] = useState<ContentType>("download-install")
 
   const menuItems = [
     {
-      category: "Allegro PCB 設計",
+      category: "License 申請",
       items: [
-        { id: "download-install" as ContentType, title: "Allegro/OrCad 下載安裝教學", icon: Download },
+        { id: "download-install" as ContentType, title: "至EIP申請權限開通", icon: Download },
         { id: "basic-interface" as ContentType, title: "基本介面操作指南", icon: Monitor },
         { id: "circuit-drawing" as ContentType, title: "電路圖繪製基礎", icon: FileText },
         { id: "pcb-layout" as ContentType, title: "PCB 佈局設計流程", icon: Layers },
@@ -66,6 +70,16 @@ export default function AllegroTutorial() {
     return ""
   }
 
+  const getCategoryTitle = (contentId: ContentType) => {
+    for (const category of menuItems) {
+      const item = category.items.find((item) => item.id === contentId)
+      if (item) {
+        return category.category
+      }
+    }
+    return "PCB 設計教學"
+  }
+
   const renderContent = () => {
     switch (activeContent) {
       case "download-install":
@@ -93,6 +107,56 @@ export default function AllegroTutorial() {
     }
   }
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === "3515") {
+      setIsAuthenticated(true)
+    } else {
+      alert("密碼錯誤，請重新輸入")
+      setPassword("")
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md w-96">
+          <div className="text-center mb-6">
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ASROCK-2rrjXm6EfQsmnXQC0s7XgVayHcLgjv.png"
+              alt="ASRock Logo"
+              className="h-12 w-auto mx-auto mb-4"
+            />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Allegro/OrCAD 安裝指南</h1>
+            <p className="text-gray-600">請輸入密碼以訪問教學內容</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                密碼
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
+                placeholder="請輸入密碼"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-lime-600 text-white py-2 px-4 rounded-md hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 transition-colors"
+            >
+              進入
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
@@ -108,7 +172,7 @@ export default function AllegroTutorial() {
               />
             </div>
 
-            <h2 className="text-lg font-semibold text-gray-800 mb-6">目錄</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-6">Allegro/OrCAD 17.4安裝指南</h2>
 
             <nav className="space-y-1">
               {menuItems.map((category, categoryIndex) => (
@@ -151,7 +215,7 @@ export default function AllegroTutorial() {
           <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
             <Home className="w-4 h-4" />
             <ChevronRight className="w-4 h-4" />
-            <span>PCB 設計教學</span>
+            <span>{getCategoryTitle(activeContent)}</span>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900">{getContentTitle(activeContent)}</span>
           </nav>
@@ -169,51 +233,113 @@ function DownloadInstallContent() {
   return (
     <div className="animate-fadeIn">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Allegro/OrCad 完整下載安裝教學指南</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">至EIP申請權限開通</h1>
         <p className="text-gray-600">2025年6月25日</p>
       </div>
 
       <div className="prose prose-lg max-w-none">
-        <p className="text-gray-700 leading-relaxed mb-6">
-          Cadence Allegro 和 OrCad 是業界領先的 PCB 設計軟體套件，廣泛應用於電子產品開發。
-          本教學將詳細介紹如何下載、安裝及初始設定這套強大的設計工具。
-        </p>
-
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-8 rounded-r-lg">
+        <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-8 rounded-r-lg">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <Download className="w-5 h-5 text-blue-400 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">重要提醒</h3>
-              <p className="mt-1 text-sm text-blue-700">
-                請確保您擁有合法的軟體授權，並從官方網站下載軟體以確保安全性。
-              </p>
+              <h3 className="text-base font-medium text-red-800">安裝前的說明</h3>
+              <div className="mt-1 text-base text-red-700 space-y-2">
+                <p>請License 申請並簽核通過後，再進行軟體安裝，否則將視為違法安裝。</p>
+                <p>License 是和您的賬號以及電腦名稱綁定的，更換OA 請重新申請。</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">系統需求檢查</h2>
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">最低系統需求</h3>
-          <ul className="space-y-3 text-gray-700">
-            <li className="flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-              作業系統：Windows 10/11 (64-bit) 或 Linux RHEL/CentOS 7+
-            </li>
-            <li className="flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-              記憶體：最少 8GB RAM（建議 16GB 以上）
-            </li>
-            <li className="flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-              硬碟空間：至少 10GB 可用空間
-            </li>
-            <li className="flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-              顯示卡：支援 OpenGL 3.0 以上
-            </li>
-          </ul>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">申請license流程</h2>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-blue-900 mb-4">至EIP申請權限開通</h3>
+          <div className="space-y-3">
+            <p className="text-blue-800">
+              <a href="http://eip.asrock.com.tw/WebAgenda/" className="text-blue-600 hover:underline font-medium">
+                http://eip.asrock.com.tw/WebAgenda/
+              </a>
+            </p>
+            <div className="bg-white p-4 rounded-lg border border-blue-200">
+              <p className="text-blue-800 font-medium mb-2">操作步驟：</p>
+              <div className="text-blue-700 space-y-1">
+                <p>表單申請 → 啟動表單 → 內部聯絡單 → 執行快速啟動</p>
+              </div>
+            </div>
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Ivkh2UuDP1Qkq0y3DAho3ZGze2IlXS.png"
+              alt="EIP表單選擇介面"
+              className="max-w-2xl mx-auto mt-4 rounded-lg border border-blue-200 w-8/12"
+            />
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5kYFkmsNk7Kud6XxDX1ZlMU1Fv8i8D.png"
+              alt="內部聯絡單表單"
+              className="max-w-4xl mx-auto mt-4 rounded-lg border border-blue-200 w-10/12"
+            />
+          </div>
+        </div>
+
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+          <p className="text-gray-700 mb-4 font-medium">請複製貼上，並把Tim改成自己名字：</p>
+
+          <div className="relative">
+            <div className="bg-white p-4 rounded border border-gray-300 font-mono text-sm">
+              <div className="space-y-3">
+                <div>
+                  <p className="font-semibold mb-2">讀取：</p>
+                  <div className="space-y-1 ml-2">
+                    <p>\\ar-file-01\\採購部料件通知</p>
+                    <p>\\Ar-ebios-03\\BIOS</p>
+                    <p>\\Asrr-qt-01\\QT</p>
+                    <p>\\ar-file-01\\Users\\PM_Team</p>
+                    <p>\\asrr-qt-01\\BIOS_Verify\\ASRock</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="font-semibold mb-2">讀寫：</p>
+                  <div className="ml-2">
+                    <div className="space-y-2">
+                      <p>
+                        \\ar-erd-01 ，另外需要建立<span className="text-red-600 font-medium">Tim</span>的資料夾
+                      </p>
+                      <p className="">
+                        https://rm.pegatroncorp.com/ RM網站WebDB使用者權限for申請OrCAD &Allegro License
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                const textToCopy = `讀取：
+\\\\ar-file-01\\採購部料件通知
+\\\\Ar-ebios-03\\BIOS
+\\\\Asrr-qt-01\\QT
+\\\\ar-file-01\\Users\\PM_Team
+\\\\asrr-qt-01\\BIOS_Verify\\ASRock
+
+讀寫：
+\\\\ar-erd-01 ，另外需要建立Tim的資料夾`
+                navigator.clipboard.writeText(textToCopy)
+                alert("已複製到剪貼簿！")
+              }}
+              className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
+            >
+              複製
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-yellow-900 mb-3">重要提醒</h3>
+          <p className="text-yellow-800 mb-2">填完後按送出並且發mail通知Oscar Lin</p>
+          <p className="text-yellow-700 font-mono text-sm">Oscar_Lin@asrock.com.tw</p>
         </div>
       </div>
     </div>
