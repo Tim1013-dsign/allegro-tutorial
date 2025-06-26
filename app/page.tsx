@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { ChevronRight, Home, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react"
+import { ChevronRight, Home, AlertTriangle, CheckCircle, ArrowRight, Menu, X } from "lucide-react"
 
 type ContentType =
   | "overview"
@@ -19,6 +19,7 @@ export default function AllegroTutorial() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
   const [activeContent, setActiveContent] = useState<ContentType>("overview")
+  const [sidebarExpanded, setSidebarExpanded] = useState(false)
 
   const menuItems = [
     {
@@ -139,54 +140,103 @@ export default function AllegroTutorial() {
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
         {/* Left Sidebar */}
-        <div className="w-80 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div
+          className={`${
+            sidebarExpanded ? "w-80" : "w-16"
+          } bg-white shadow-sm border-r border-gray-200 min-h-screen transition-all duration-300 ease-in-out relative z-10`}
+          onMouseEnter={() => setSidebarExpanded(true)}
+          onMouseLeave={() => setSidebarExpanded(false)}
+        >
           <div className="p-6">
-            {/* ASRock Logo */}
-            <div className="flex justify-center mb-6 pb-4 border-b border-gray-100">
-              <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ASROCK-2rrjXm6EfQsmnXQC0s7XgVayHcLgjv.png"
-                alt="ASRock Logo"
-                className="h-8 w-auto"
-              />
+            {/* Toggle Button */}
+            <div className="flex justify-center mb-6">
+              {sidebarExpanded ? (
+                <div className="flex flex-col items-center pb-4 border-b border-gray-100">
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ASROCK-2rrjXm6EfQsmnXQC0s7XgVayHcLgjv.png"
+                    alt="ASRock Logo"
+                    className="h-8 w-auto mb-2"
+                  />
+                  <X className="w-5 h-5 text-gray-400" />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Menu className="w-6 h-6 text-gray-600 mb-2" />
+                  <div className="w-8 h-1 bg-lime-500 rounded"></div>
+                </div>
+              )}
             </div>
 
-            <h2 className="text-lg font-semibold text-gray-800 mb-6">Allegro/OrCAD 17.4 安裝指南</h2>
+            {sidebarExpanded && (
+              <div className="animate-fadeIn">
+                <h2 className="text-lg font-semibold text-gray-800 mb-6">Allegro/OrCAD 17.4 安裝指南</h2>
 
-            <nav className="space-y-1">
-              {menuItems.map((category, categoryIndex) => (
-                <div key={categoryIndex} className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-600 mb-2">{category.category}</h3>
-                  <ul className="space-y-1 ml-4">
-                    {category.items.map((item) => {
-                      const isActive = activeContent === item.id
-                      return (
-                        <li key={item.id}>
-                          <button
-                            onClick={() => setActiveContent(item.id)}
-                            className={`flex items-center text-sm px-3 py-2 rounded-md w-full text-left transition-all duration-200 ${
-                              isActive
-                                ? "bg-lime-50 text-lime-600 border-l-2 border-lime-500"
-                                : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                            }`}
-                          >
-                            {isActive ? (
-                              <span className="w-2 h-2 rounded-full mr-3 bg-lime-600"></span>
-                            ) : item.number === 0 ? (
-                              <Home className="w-4 h-4 mr-3" />
-                            ) : (
-                              <span className="w-6 h-6 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-medium mr-3">
-                                {item.number}
-                              </span>
-                            )}
-                            {item.title}
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </nav>
+                <nav className="space-y-1">
+                  {menuItems.map((category, categoryIndex) => (
+                    <div key={categoryIndex} className="mb-4">
+                      <h3 className="text-sm font-medium text-gray-600 mb-2">{category.category}</h3>
+                      <ul className="space-y-1 ml-4">
+                        {category.items.map((item) => {
+                          const isActive = activeContent === item.id
+                          return (
+                            <li key={item.id}>
+                              <button
+                                onClick={() => setActiveContent(item.id)}
+                                className={`flex items-center text-sm px-3 py-2 rounded-md w-full text-left transition-all duration-200 ${
+                                  isActive
+                                    ? "bg-lime-50 text-lime-600 border-l-2 border-lime-500"
+                                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                                }`}
+                              >
+                                {isActive ? (
+                                  <span className="w-2 h-2 rounded-full mr-3 bg-lime-600"></span>
+                                ) : item.number === 0 ? (
+                                  <Home className="w-4 h-4 mr-3" />
+                                ) : (
+                                  <span className="w-6 h-6 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-medium mr-3">
+                                    {item.number}
+                                  </span>
+                                )}
+                                {item.title}
+                              </button>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </nav>
+              </div>
+            )}
+
+            {!sidebarExpanded && (
+              <div className="space-y-3">
+                {menuItems.map((category) =>
+                  category.items.map((item) => {
+                    const isActive = activeContent === item.id
+                    return (
+                      <div key={item.id} className="flex justify-center">
+                        <button
+                          onClick={() => setActiveContent(item.id)}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                            isActive
+                              ? "bg-lime-100 text-lime-600 border-2 border-lime-500"
+                              : "text-gray-600 hover:bg-gray-100"
+                          }`}
+                          title={item.title}
+                        >
+                          {item.number === 0 ? (
+                            <Home className="w-5 h-5" />
+                          ) : (
+                            <span className="text-sm font-medium">{item.number}</span>
+                          )}
+                        </button>
+                      </div>
+                    )
+                  }),
+                )}
+              </div>
+            )}
           </div>
         </div>
 
